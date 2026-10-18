@@ -1,0 +1,54 @@
+services:
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: test_user
+      POSTGRES_DB: test_db
+    ports:
+      - "5432:5432"
+  test_be:
+    container_name: book-be
+    depends_on:
+      - db
+    build:
+      context: ../test
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      DB_ADDRESS: db
+      DB_PORT: 5432
+      DB_USER: test_user
+      DB_PASSWORD: password
+      DB_NAME: test_db
+  frontend:
+    depends_on:
+      - test_be
+    container_name: book-fe
+    build:
+      context: ../adventure-bookstore
+      dockerfile: Dockerfile
+    ports:
+      - "4200:80"
+  cache:
+    image: redis
+    restart: always
+    ports:
+      - '6379:6379'
+  floci-az:
+    image: floci/floci-az:latest
+    ports:
+      - 4577:4577
+    environment:
+      - FLOCI_AZ_SERVICES_ACR_BASE_PORT=5100
+      - FLOCI_AZ_SERVICES_ACR_MAX_PORT=5110
+      - FLOCI_AZ_SERVICES_AKS_ENABLED=true
+      - FLOCI_AZ_SERVICES_AKS_MOCKED=false
+      - FLOCI_AZ_SERVICES_AKS_DEFAULT_IMAGE=rancher/k3s:latest
+      - FLOCI_AZ_SERVICES_AKS_API_SERVER_BASE_PORT=16443
+      - FLOCI_AZ_SERVICES_AKS_API_SERVER_MAX_PORT=16460
+      - FLOCI_AZ_SERVICES_AKS_KEEP_RUNNING_ON_SHUTDOWN=false
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+

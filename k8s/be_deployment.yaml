@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: be-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: be
+  template:
+    metadata:
+      labels:
+        app: be
+    spec:
+      containers:
+        - name: be-containers
+          image: floci-az-acr-registry:5000/aipaipara/myapp2:S100
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          env:
+           - name: DB_ADDRESS
+             value: db-deployment
+           - name: DB_PORT
+             value: "5432"
+           - name: DB_USER
+             value: "test_user"
+           - name: DB_PASSWORD
+             value: "password"
+           - name: DB_NAME
+             value: "test_db"
+
