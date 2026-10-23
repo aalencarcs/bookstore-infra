@@ -29,4 +29,11 @@ spec:
              value: "password"
            - name: DB_NAME
              value: "test_db"
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128mi"
+              ephemeral-storage: "1Gi"
+            limits:
+              memory: "256Mi"
 
